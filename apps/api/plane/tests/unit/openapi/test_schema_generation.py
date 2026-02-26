@@ -110,12 +110,8 @@ class TestOpenAPISchemaGeneration:
 
     def test_schema_validates(self):
         """Schema should pass drf-spectacular's built-in validation."""
-        # validate_schema returns a list of warnings/errors
-        result = validate_schema(self.schema)
-        errors = [r for r in result if "error" in str(r).lower()]
-        assert len(errors) == 0, (
-            f"Schema validation errors: {errors}"
-        )
+        # validate_schema raises jsonschema.ValidationError on failure
+        validate_schema(self.schema)
 
     def test_schema_has_component_schemas(self):
         """Schema should define reusable component schemas (serializers)."""
