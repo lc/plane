@@ -102,6 +102,7 @@ dev-editor
 storybook-static
 
 CLAUDE.md
+.worktrees/
 
 build/
 .react-router/
