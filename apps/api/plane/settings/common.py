@@ -459,12 +459,13 @@ ATTACHMENT_MIME_TYPES = [
 # Seed directory path
 SEED_DIR = os.path.join(BASE_DIR, "seeds")
 
-ENABLE_DRF_SPECTACULAR = os.environ.get("ENABLE_DRF_SPECTACULAR", "0") == "1"
+# OpenAPI Schema Generation (drf-spectacular)
+# Set DISABLE_DRF_SPECTACULAR=1 to disable schema endpoints in production if needed
+ENABLE_DRF_SPECTACULAR = os.environ.get("DISABLE_DRF_SPECTACULAR", "0") != "1"
 
-if ENABLE_DRF_SPECTACULAR:
-    REST_FRAMEWORK["DEFAULT_SCHEMA_CLASS"] = "drf_spectacular.openapi.AutoSchema"
-    INSTALLED_APPS.append("drf_spectacular")
-    from .openapi import SPECTACULAR_SETTINGS  # noqa: F401
+REST_FRAMEWORK["DEFAULT_SCHEMA_CLASS"] = "drf_spectacular.openapi.AutoSchema"
+INSTALLED_APPS.append("drf_spectacular")
+from .openapi import SPECTACULAR_SETTINGS  # noqa: F401
 
 # MongoDB Settings
 MONGO_DB_URL = os.environ.get("MONGO_DB_URL", False)
