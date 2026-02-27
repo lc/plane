@@ -43,6 +43,9 @@ export interface IProjectPageStore {
   // computed
   isAnyPageAvailable: boolean;
   canCurrentUserCreatePage: boolean;
+  expandedPageIds: Set<string>;
+  togglePageExpanded: (pageId: string) => void;
+  getChildPageIds: (parentId: string) => string[];
   // helper actions
   getCurrentProjectPageIdsByTab: (pageType: TPageNavigationTabs) => string[] | undefined;
   getCurrentProjectPageIds: (projectId: string) => string[];
@@ -77,6 +80,7 @@ export class ProjectPageStore implements IProjectPageStore {
     sortKey: "updated_at",
     sortBy: "desc",
   };
+  expandedPageIds: Set<string> = new Set();
   // service
   service: ProjectPageService;
   rootStore: CoreRootStore;
@@ -88,6 +92,9 @@ export class ProjectPageStore implements IProjectPageStore {
       data: observable,
       error: observable,
       filters: observable,
+      expandedPageIds: observable,
+      // actions
+      togglePageExpanded: action,
       // computed
       isAnyPageAvailable: computed,
       canCurrentUserCreatePage: computed,
@@ -172,6 +179,7 @@ export class ProjectPageStore implements IProjectPageStore {
     const pagesByType = filterPagesByPageType(pageType, Object.values(this?.data || {}));
     let filteredPages = pagesByType.filter(
       (p) =>
+        !p.parent &&
         p.project_ids?.includes(projectId) &&
         getPageName(p.name).toLowerCase().includes(this.filters.searchQuery.toLowerCase()) &&
         shouldFilterPage(p, this.filters.filters)
@@ -202,6 +210,31 @@ export class ProjectPageStore implements IProjectPageStore {
     runInAction(() => {
       set(this.filters, ["filters"], {});
     });
+
+  /**
+   * @description toggle expand/collapse state for a page
+   */
+  togglePageExpanded = (pageId: string) => {
+    runInAction(() => {
+      const newSet = new Set(this.expandedPageIds);
+      if (newSet.has(pageId)) {
+        newSet.delete(pageId);
+      } else {
+        newSet.add(pageId);
+      }
+      this.expandedPageIds = newSet;
+    });
+  };
+
+  /**
+   * @description get child page ids for a given parent
+   */
+  getChildPageIds = computedFn((parentId: string): string[] => {
+    const children = Object.values(this.data || {}).filter(
+      (page) => page.parent === parentId && !page.archived_at
+    );
+    return children.map((page) => page.id).filter((id): id is string => !!id);
+  });
 
   /**
    * @description fetch all the pages
