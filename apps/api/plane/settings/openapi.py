@@ -96,6 +96,21 @@ SPECTACULAR_SETTINGS = {
                 "*Use Cases:* Work item triage, external submissions, quality review, approval workflows."
             ),
         },
+        # Workspace Management
+        {
+            "name": "Invitations",
+            "description": (
+                "**Workspace Invitations**\n\n"
+                "Invite users to join a workspace by email. Manage pending invitations, "
+                "update roles, and revoke invitations that haven't been accepted.\n\n"
+                "*Key Features:*\n"
+                "- Invite users by email address\n"
+                "- Set role on invitation (admin, member, guest)\n"
+                "- List and filter pending invitations\n"
+                "- Revoke unaccepted invitations\n\n"
+                "*Use Cases:* Team onboarding, role-based access setup, invitation management."
+            ),
+        },
         # Project Organization
         {
             "name": "Labels",

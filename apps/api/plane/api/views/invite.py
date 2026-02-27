@@ -40,6 +40,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
         return self.get_queryset().get(pk=self.kwargs.get("pk"))
 
     @extend_schema(
+        tags=["Invitations"],
         summary="List workspace invites",
         description="List all workspace invites for a workspace",
         responses={
@@ -58,6 +59,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
+        tags=["Invitations"],
         summary="Get workspace invite",
         description="Get a workspace invite by ID",
         responses={200: OpenApiResponse(description="Workspace invite", response=WorkspaceInviteSerializer)},
@@ -78,6 +80,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
+        tags=["Invitations"],
         summary="Create workspace invite",
         description="Create a workspace invite",
         responses={201: OpenApiResponse(description="Workspace invite", response=WorkspaceInviteSerializer)},
@@ -94,6 +97,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
+        tags=["Invitations"],
         summary="Update workspace invite",
         description="Update a workspace invite",
         responses={200: OpenApiResponse(description="Workspace invite", response=WorkspaceInviteSerializer)},
@@ -124,6 +128,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
+        tags=["Invitations"],
         summary="Delete workspace invite",
         description="Delete a workspace invite",
         responses={204: OpenApiResponse(description="Workspace invite deleted")},
