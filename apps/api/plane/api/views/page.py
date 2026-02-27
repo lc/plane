@@ -8,12 +8,28 @@ from django.db.models import Q
 # Third party imports
 from rest_framework import status
 from rest_framework.response import Response
+from drf_spectacular.utils import OpenApiResponse, OpenApiRequest
 
 # Module imports
 from plane.api.serializers import PageSerializer, PageDetailSerializer
 from plane.app.permissions import ProjectEntityPermission
 from plane.db.models import Page, ProjectPage
 from .base import BaseAPIView
+from plane.utils.openapi import (
+    page_docs,
+    PAGE_ID_PARAMETER,
+    CURSOR_PARAMETER,
+    PER_PAGE_PARAMETER,
+    FIELDS_PARAMETER,
+    EXPAND_PARAMETER,
+    create_paginated_response,
+    PAGE_CREATE_EXAMPLE,
+    PAGE_UPDATE_EXAMPLE,
+    PAGE_EXAMPLE,
+    INVALID_REQUEST_RESPONSE,
+    EXTERNAL_ID_EXISTS_RESPONSE,
+    DELETED_RESPONSE,
+)
 
 
 class PageListCreateAPIEndpoint(BaseAPIView):
@@ -42,8 +58,30 @@ class PageListCreateAPIEndpoint(BaseAPIView):
             .distinct()
         )
 
+    @page_docs(
+        operation_id="create_page",
+        summary="Create page",
+        description="Create a new page in a project.",
+        request=OpenApiRequest(
+            request=PageDetailSerializer,
+            examples=[PAGE_CREATE_EXAMPLE],
+        ),
+        responses={
+            201: OpenApiResponse(
+                description="Page created",
+                response=PageDetailSerializer,
+                examples=[PAGE_EXAMPLE],
+            ),
+            400: INVALID_REQUEST_RESPONSE,
+            409: EXTERNAL_ID_EXISTS_RESPONSE,
+        },
+    )
     def post(self, request, slug, project_id):
-        """Create page"""
+        """Create page
+
+        Create a new page in a project.
+        Supports external ID tracking for integration purposes.
+        """
         serializer = PageSerializer(
             data=request.data,
             context={
@@ -77,8 +115,31 @@ class PageListCreateAPIEndpoint(BaseAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @page_docs(
+        operation_id="list_pages",
+        summary="List pages",
+        description="Retrieve all pages for a project.",
+        parameters=[
+            CURSOR_PARAMETER,
+            PER_PAGE_PARAMETER,
+            FIELDS_PARAMETER,
+            EXPAND_PARAMETER,
+        ],
+        responses={
+            200: create_paginated_response(
+                PageSerializer,
+                "PaginatedPageResponse",
+                "Paginated list of pages",
+                "Paginated Pages",
+            ),
+        },
+    )
     def get(self, request, slug, project_id):
-        """List pages"""
+        """List pages
+
+        Retrieve all pages for a project.
+        Returns paginated results when listing all pages.
+        """
         return self.paginate(
             request=request,
             queryset=self.get_queryset(),
@@ -111,16 +172,59 @@ class PageDetailAPIEndpoint(BaseAPIView):
             .distinct()
         )
 
+    @page_docs(
+        operation_id="retrieve_page",
+        summary="Retrieve page",
+        description="Retrieve details of a specific page including its content.",
+        parameters=[
+            PAGE_ID_PARAMETER,
+        ],
+        responses={
+            200: OpenApiResponse(
+                description="Page retrieved",
+                response=PageDetailSerializer,
+                examples=[PAGE_EXAMPLE],
+            ),
+        },
+    )
     def get(self, request, slug, project_id, page_id):
-        """Retrieve page"""
+        """Retrieve page
+
+        Retrieve details of a specific page including its content.
+        """
         page = self.get_queryset().get(pk=page_id)
         serializer = PageDetailSerializer(
             page, fields=self.fields, expand=self.expand
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @page_docs(
+        operation_id="update_page",
+        summary="Update page",
+        description="Partially update an existing page's properties like name, content, or access level.",
+        parameters=[
+            PAGE_ID_PARAMETER,
+        ],
+        request=OpenApiRequest(
+            request=PageDetailSerializer,
+            examples=[PAGE_UPDATE_EXAMPLE],
+        ),
+        responses={
+            200: OpenApiResponse(
+                description="Page updated",
+                response=PageDetailSerializer,
+                examples=[PAGE_EXAMPLE],
+            ),
+            400: INVALID_REQUEST_RESPONSE,
+            409: EXTERNAL_ID_EXISTS_RESPONSE,
+        },
+    )
     def patch(self, request, slug, project_id, page_id):
-        """Update page"""
+        """Update page
+
+        Partially update an existing page's properties like name, content, or access level.
+        Locked pages cannot be updated. Only the page owner can change access level.
+        """
         page = Page.objects.get(
             workspace__slug=slug, pk=page_id
         )
@@ -175,8 +279,23 @@ class PageDetailAPIEndpoint(BaseAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @page_docs(
+        operation_id="delete_page",
+        summary="Delete page",
+        description="Permanently remove a page. Only the page owner can delete, and the page must be archived first.",
+        parameters=[
+            PAGE_ID_PARAMETER,
+        ],
+        responses={
+            204: DELETED_RESPONSE,
+        },
+    )
     def delete(self, request, slug, project_id, page_id):
-        """Delete page"""
+        """Delete page
+
+        Permanently remove a page. Only the page owner can delete,
+        and the page must be archived first.
+        """
         page = Page.objects.get(
             workspace__slug=slug, pk=page_id
         )

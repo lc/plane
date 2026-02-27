@@ -330,6 +330,27 @@ PROJECT_UPDATE_EXAMPLE = OpenApiExample(
     description="Example request for updating a project",
 )
 
+# Page Examples
+PAGE_CREATE_EXAMPLE = OpenApiExample(
+    "PageCreateSerializer",
+    value={
+        "name": "New Page",
+        "description_html": "<p>Page content goes here</p>",
+        "access": 0,
+        "color": "#3498db",
+    },
+    description="Example request for creating a page",
+)
+
+PAGE_UPDATE_EXAMPLE = OpenApiExample(
+    "PageUpdateSerializer",
+    value={
+        "name": "Updated Page",
+        "description_html": "<p>Updated content</p>",
+    },
+    description="Example request for updating a page",
+)
+
 # State Examples
 STATE_CREATE_EXAMPLE = OpenApiExample(
     "StateCreateSerializer",
@@ -463,6 +484,24 @@ STATE_EXAMPLE = OpenApiExample(
         "group": "started",
         "sequence": 2,
         "default": False,
+        "created_at": "2024-01-01T10:30:00Z",
+        "updated_at": "2024-01-10T15:45:00Z",
+    },
+)
+
+# Page Response Examples
+PAGE_EXAMPLE = OpenApiExample(
+    name="Page",
+    value={
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Project Architecture",
+        "access": 0,
+        "color": "#3498db",
+        "parent": None,
+        "is_locked": False,
+        "archived_at": None,
+        "owned_by": "660e8400-e29b-41d4-a716-446655440000",
+        "workspace": "770e8400-e29b-41d4-a716-446655440000",
         "created_at": "2024-01-01T10:30:00Z",
         "updated_at": "2024-01-10T15:45:00Z",
     },
@@ -801,6 +840,20 @@ SAMPLE_STICKY = {
     "created_at": "2024-01-01T10:30:00Z",
 }
 
+SAMPLE_PAGE = {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Project Architecture",
+    "access": 0,
+    "color": "#3498db",
+    "parent": None,
+    "is_locked": False,
+    "archived_at": None,
+    "owned_by": "660e8400-e29b-41d4-a716-446655440000",
+    "workspace": "770e8400-e29b-41d4-a716-446655440000",
+    "created_at": "2024-01-01T10:30:00Z",
+    "updated_at": "2024-01-10T15:45:00Z",
+}
+
 # Mapping of schema types to sample data
 SCHEMA_EXAMPLES = {
     "Issue": SAMPLE_ISSUE,
@@ -816,6 +869,7 @@ SCHEMA_EXAMPLES = {
     "Intake": SAMPLE_INTAKE,
     "CycleIssue": SAMPLE_CYCLE_ISSUE,
     "Sticky": SAMPLE_STICKY,
+    "Page": SAMPLE_PAGE,
 }
 
 
