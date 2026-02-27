@@ -42,7 +42,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
     @extend_schema(
         tags=["Invitations"],
         summary="List workspace invites",
-        description="List all workspace invites for a workspace",
+        description="List all pending and accepted invitations for a workspace. Returns invitation details including email, role, and response status.",
         responses={
             200: OpenApiResponse(
                 description="Workspace invites",
@@ -61,7 +61,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
     @extend_schema(
         tags=["Invitations"],
         summary="Get workspace invite",
-        description="Get a workspace invite by ID",
+        description="Retrieve details of a specific workspace invitation including email, role, and acceptance status.",
         responses={200: OpenApiResponse(description="Workspace invite", response=WorkspaceInviteSerializer)},
         parameters=[
             WORKSPACE_SLUG_PARAMETER,
@@ -82,7 +82,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
     @extend_schema(
         tags=["Invitations"],
         summary="Create workspace invite",
-        description="Create a workspace invite",
+        description="Send a workspace invitation to a user by email. Assigns the specified role (admin, member, or guest) upon acceptance.",
         responses={201: OpenApiResponse(description="Workspace invite", response=WorkspaceInviteSerializer)},
         request=OpenApiRequest(request=WorkspaceInviteSerializer),
         parameters=[
@@ -99,7 +99,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
     @extend_schema(
         tags=["Invitations"],
         summary="Update workspace invite",
-        description="Update a workspace invite",
+        description="Update the role assigned to a pending workspace invitation. Email address cannot be changed after creation.",
         responses={200: OpenApiResponse(description="Workspace invite", response=WorkspaceInviteSerializer)},
         request=OpenApiRequest(request=WorkspaceInviteSerializer),
         parameters=[
@@ -130,7 +130,7 @@ class WorkspaceInvitationsViewset(BaseViewSet):
     @extend_schema(
         tags=["Invitations"],
         summary="Delete workspace invite",
-        description="Delete a workspace invite",
+        description="Revoke a workspace invitation. Only unaccepted invitations can be deleted.",
         responses={204: OpenApiResponse(description="Workspace invite deleted")},
         parameters=[
             WORKSPACE_SLUG_PARAMETER,

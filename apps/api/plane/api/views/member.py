@@ -143,7 +143,7 @@ class ProjectMemberListCreateAPIEndpoint(BaseAPIView):
     @extend_schema(
         operation_id="create_project_member",
         summary="Create project member",
-        description="Create a new project member",
+        description="Add a workspace member to a project with the specified role. The user must already be a workspace member.",
         tags=["Members"],
         parameters=[WORKSPACE_SLUG_PARAMETER, PROJECT_ID_PARAMETER],
         responses={201: OpenApiResponse(description="Project member created", response=ProjectMemberSerializer)},
@@ -161,7 +161,7 @@ class ProjectMemberDetailAPIEndpoint(ProjectMemberListCreateAPIEndpoint):
     @extend_schema(
         operation_id="get_project_member",
         summary="Get project member",
-        description="Retrieve a project member by ID.",
+        description="Retrieve a project member's details including their role and profile information.",
         tags=["Members"],
         parameters=[WORKSPACE_SLUG_PARAMETER, PROJECT_ID_PARAMETER],
         responses={
@@ -194,7 +194,7 @@ class ProjectMemberDetailAPIEndpoint(ProjectMemberListCreateAPIEndpoint):
     @extend_schema(
         operation_id="update_project_member",
         summary="Update project member",
-        description="Update a project member",
+        description="Update a project member's role. Requires project admin permissions.",
         tags=["Members"],
         parameters=[WORKSPACE_SLUG_PARAMETER, PROJECT_ID_PARAMETER],
         responses={200: OpenApiResponse(description="Project member updated", response=ProjectMemberSerializer)},
@@ -210,7 +210,7 @@ class ProjectMemberDetailAPIEndpoint(ProjectMemberListCreateAPIEndpoint):
     @extend_schema(
         operation_id="delete_project_member",
         summary="Delete project member",
-        description="Delete a project member",
+        description="Remove a member from the project. The member retains workspace access.",
         tags=["Members"],
         parameters=[WORKSPACE_SLUG_PARAMETER, PROJECT_ID_PARAMETER],
         responses={204: OpenApiResponse(description="Project member deleted")},

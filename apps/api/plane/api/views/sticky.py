@@ -39,7 +39,7 @@ class StickyViewSet(BaseViewSet):
     @sticky_docs(
         operation_id="create_sticky",
         summary="Create a new sticky",
-        description="Create a new sticky in the workspace",
+        description="Create a new sticky note in the workspace. The sticky is owned by the authenticated user.",
         request=OpenApiRequest(request=StickySerializer),
         responses={
             201: OpenApiResponse(description="Sticky created", response=StickySerializer, examples=[STICKY_EXAMPLE])
@@ -56,7 +56,7 @@ class StickyViewSet(BaseViewSet):
     @sticky_docs(
         operation_id="list_stickies",
         summary="List stickies",
-        description="List all stickies in the workspace",
+        description="List all stickies owned by the current user in the workspace. Supports search via `query` parameter and pagination.",
         responses={
             200: create_paginated_response(
                 StickySerializer, "Sticky", "List of stickies", example_name="List of stickies"
@@ -79,7 +79,7 @@ class StickyViewSet(BaseViewSet):
     @sticky_docs(
         operation_id="retrieve_sticky",
         summary="Retrieve a sticky",
-        description="Retrieve a sticky by its ID",
+        description="Retrieve a specific sticky note by ID. Only accessible by the owner.",
         responses={200: OpenApiResponse(description="Sticky", response=StickySerializer, examples=[STICKY_EXAMPLE])},
     )
     def retrieve(self, request, slug, pk):
@@ -89,7 +89,7 @@ class StickyViewSet(BaseViewSet):
     @sticky_docs(
         operation_id="update_sticky",
         summary="Update a sticky",
-        description="Update a sticky by its ID",
+        description="Update a sticky note's content or properties. Only the owner can update.",
         request=OpenApiRequest(request=StickySerializer),
         responses={200: OpenApiResponse(description="Sticky", response=StickySerializer, examples=[STICKY_EXAMPLE])},
     )
@@ -104,7 +104,7 @@ class StickyViewSet(BaseViewSet):
     @sticky_docs(
         operation_id="delete_sticky",
         summary="Delete a sticky",
-        description="Delete a sticky by its ID",
+        description="Permanently delete a sticky note. Only the owner can delete.",
         responses={204: DELETED_RESPONSE},
     )
     def destroy(self, request, slug, pk):
