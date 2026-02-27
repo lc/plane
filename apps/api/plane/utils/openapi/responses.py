@@ -406,10 +406,46 @@ def create_paginated_response(
 
 
 # Asset-specific Responses
-PRESIGNED_URL_SUCCESS_RESPONSE = OpenApiResponse(description="Presigned URL generated successfully")
+PRESIGNED_URL_SUCCESS_RESPONSE = OpenApiResponse(
+    description="Presigned URL generated successfully",
+    response=inline_serializer(
+        name="PresignedURLResponse",
+        fields={
+            "upload_data": serializers.JSONField(help_text="Presigned POST data for direct S3 upload"),
+            "asset_id": serializers.UUIDField(help_text="Unique identifier for the created asset"),
+            "asset_url": serializers.CharField(help_text="CDN URL for the asset after upload"),
+        },
+    ),
+    examples=[
+        OpenApiExample(
+            name="Presigned URL Response",
+            value={
+                "upload_data": {
+                    "url": "https://s3.amazonaws.com/bucket-name",
+                    "fields": {
+                        "key": "workspace-id/uuid-filename.jpg",
+                        "AWSAccessKeyId": "AKIA...",
+                        "policy": "eyJ...",
+                        "signature": "abc123...",
+                    },
+                },
+                "asset_id": "550e8400-e29b-41d4-a716-446655440000",
+                "asset_url": "https://cdn.example.com/workspace-id/uuid-filename.jpg",
+            },
+        )
+    ],
+)
 
 GENERIC_ASSET_UPLOAD_SUCCESS_RESPONSE = OpenApiResponse(
     description="Presigned URL generated successfully",
+    response=inline_serializer(
+        name="GenericAssetUploadResponse",
+        fields={
+            "upload_data": serializers.JSONField(help_text="Presigned POST data for direct S3 upload"),
+            "asset_id": serializers.UUIDField(help_text="Unique identifier for the created asset"),
+            "asset_url": serializers.CharField(help_text="CDN URL for the asset after upload"),
+        },
+    ),
     examples=[
         OpenApiExample(
             name="Generic Asset Upload Response",
@@ -459,7 +495,16 @@ ASSET_CONFLICT_RESPONSE = OpenApiResponse(
 )
 
 ASSET_DOWNLOAD_SUCCESS_RESPONSE = OpenApiResponse(
-    description="Presigned download URL generated successfully",
+    description="Asset metadata with presigned download URL",
+    response=inline_serializer(
+        name="AssetDownloadResponse",
+        fields={
+            "asset_id": serializers.UUIDField(help_text="Unique identifier for the asset"),
+            "asset_url": serializers.CharField(help_text="Presigned download URL (time-limited)"),
+            "asset_name": serializers.CharField(help_text="Original filename"),
+            "asset_type": serializers.CharField(help_text="MIME type of the asset"),
+        },
+    ),
     examples=[
         OpenApiExample(
             name="Asset Download Response",
