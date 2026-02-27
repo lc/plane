@@ -32,6 +32,7 @@ class PageSerializer(BaseSerializer):
     # Many to many
     label_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
     project_ids = serializers.ListField(child=serializers.UUIDField(), required=False)
+    sub_pages_count = serializers.IntegerField(read_only=True, required=False, default=0)
 
     class Meta:
         model = Page
@@ -55,6 +56,7 @@ class PageSerializer(BaseSerializer):
             "logo_props",
             "label_ids",
             "project_ids",
+            "sub_pages_count",
         ]
         read_only_fields = ["workspace", "owned_by"]
 

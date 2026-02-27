@@ -94,12 +94,17 @@ class PageViewSet(BaseViewSet):
                 projects__project_projectmember__is_active=True,
                 projects__archived_at__isnull=True,
             )
-            .filter(parent__isnull=True)
             .filter(Q(owned_by=self.request.user) | Q(access=0))
             .prefetch_related("projects")
             .select_related("workspace")
             .select_related("owned_by")
             .annotate(is_favorite=Exists(subquery))
+            .annotate(
+                sub_pages_count=Count(
+                    "child_page",
+                    filter=Q(child_page__archived_at__isnull=True),
+                )
+            )
             .order_by(self.request.GET.get("order_by", "-created_at"))
             .prefetch_related("labels")
             .order_by("-is_favorite", "-created_at")
@@ -426,7 +431,6 @@ class PageViewSet(BaseViewSet):
                 projects__project_projectmember__is_active=True,
                 projects__archived_at__isnull=True,
             )
-            .filter(parent__isnull=True)
             .filter(Q(owned_by=request.user) | Q(access=0))
             .annotate(
                 project=Exists(
