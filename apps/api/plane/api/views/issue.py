@@ -37,7 +37,9 @@ from drf_spectacular.utils import (
     OpenApiResponse,
     OpenApiExample,
     OpenApiRequest,
+    inline_serializer,
 )
+from rest_framework import serializers as drf_serializers
 
 # Module imports
 from plane.api.serializers import (
@@ -1742,31 +1744,27 @@ class IssueAttachmentListCreateAPIEndpoint(BaseAPIView):
         ),
         responses={
             200: OpenApiResponse(
-                description="Presigned download URL generated successfully",
+                description="Presigned upload URL and attachment metadata",
+                response=inline_serializer(
+                    name="AttachmentUploadResponse",
+                    fields={
+                        "upload_data": drf_serializers.JSONField(help_text="Presigned POST data for direct S3 upload"),
+                        "asset_id": drf_serializers.UUIDField(help_text="Unique identifier for the attachment asset"),
+                        "attachment": drf_serializers.JSONField(help_text="Serialized attachment metadata"),
+                        "asset_url": drf_serializers.CharField(help_text="CDN URL for the attachment after upload"),
+                    },
+                ),
                 examples=[
                     OpenApiExample(
-                        name="Work Item Attachment Response",
+                        name="Attachment Upload Response",
                         value={
                             "upload_data": {
-                                "url": "https://s3.amazonaws.com/bucket/file.pdf?signed-url",
-                                "fields": {
-                                    "key": "file.pdf",
-                                    "AWSAccessKeyId": "AKIAIOSFODNN7EXAMPLE",
-                                    "policy": "EXAMPLE",
-                                    "signature": "EXAMPLE",
-                                    "acl": "public-read",
-                                    "Content-Type": "application/pdf",
-                                },
+                                "url": "https://s3.amazonaws.com/bucket-name",
+                                "fields": {"key": "...", "policy": "...", "signature": "..."},
                             },
                             "asset_id": "550e8400-e29b-41d4-a716-446655440000",
-                            "asset_url": "https://s3.amazonaws.com/bucket/file.pdf?signed-url",
-                            "attachment": {
-                                "id": "550e8400-e29b-41d4-a716-446655440000",
-                                "name": "file.pdf",
-                                "type": "application/pdf",
-                                "size": 1234567890,
-                                "url": "https://s3.amazonaws.com/bucket/file.pdf?signed-url",
-                            },
+                            "attachment": {"id": "550e8400-e29b-41d4-a716-446655440000", "attributes": {"name": "screenshot.png"}},
+                            "asset_url": "https://cdn.example.com/attachment.png",
                         },
                     )
                 ],
