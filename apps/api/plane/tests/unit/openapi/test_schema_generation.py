@@ -146,3 +146,38 @@ class TestOpenAPISchemaGeneration:
         assert len(set(duplicates)) == 0, (
             f"Duplicate operationIds: {set(duplicates)}"
         )
+
+    def test_data_returning_operations_have_response_schemas(self):
+        """Operations that return data (not 204/302) should have response schemas."""
+        paths = self.schema.get("paths", {})
+        missing = []
+
+        for path_key, methods in paths.items():
+            for method, op in methods.items():
+                if method not in ("get", "post", "patch", "delete"):
+                    continue
+                responses = op.get("responses", {})
+                # Check if any success response (2xx/3xx) has content
+                has_success_content = False
+                has_no_body_response = False
+                for code, resp in responses.items():
+                    code_str = str(code)
+                    is_success = code_str.startswith("2") or code_str.startswith("3")
+                    if is_success:
+                        if code_str in ("204", "302"):
+                            has_no_body_response = True
+                        if resp.get("content"):
+                            has_success_content = True
+
+                # If the only success response is 204/302, no schema needed
+                if has_no_body_response and not has_success_content:
+                    continue
+
+                # Otherwise, at least one success response should have content
+                if not has_success_content:
+                    op_id = op.get("operationId", "unknown")
+                    missing.append(f"{method.upper()} {path_key} ({op_id})")
+
+        assert len(missing) == 0, (
+            f"Operations returning data but missing response schemas: {missing}"
+        )
