@@ -102,6 +102,8 @@ export class BasePage extends ExtendedBasePage implements TBasePage {
   created_at: Date | undefined;
   updated_at: Date | undefined;
   deleted_at: Date | undefined;
+  parent: string | null | undefined;
+  sub_pages_count: number = 0;
   // helpers
   oldName: string = "";
   // services
@@ -140,6 +142,8 @@ export class BasePage extends ExtendedBasePage implements TBasePage {
     this.updated_at = page?.updated_at || undefined;
     this.oldName = page?.name || "";
     this.deleted_at = page?.deleted_at || undefined;
+    this.parent = page?.parent ?? null;
+    this.sub_pages_count = page?.sub_pages_count ?? 0;
 
     makeObservable(this, {
       // loaders
@@ -164,6 +168,8 @@ export class BasePage extends ExtendedBasePage implements TBasePage {
       created_at: observable.ref,
       updated_at: observable.ref,
       deleted_at: observable.ref,
+      parent: observable.ref,
+      sub_pages_count: observable.ref,
       isSyncingWithServer: observable.ref,
       // helpers
       oldName: observable.ref,
